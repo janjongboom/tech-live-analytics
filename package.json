@@ -1,0 +1,24 @@
+{
+  "name": "tech-live-analytics",
+  "version": "1.0.0",
+  "description": "Demo of using Google Analytics for tracking products in a physical store",
+  "main": "ga-service/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/janjongboom/tech-live-analytics.git"
+  },
+  "author": "Jan Jongboom <jan.jongboom@arm.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/janjongboom/tech-live-analytics/issues"
+  },
+  "homepage": "https://github.com/janjongboom/tech-live-analytics#readme",
+  "dependencies": {
+    "es6-promisify": "^5.0.0",
+    "mbed-connector-api": "^3.0.0",
+    "universal-analytics": "^0.4.13"
+  }
+}
