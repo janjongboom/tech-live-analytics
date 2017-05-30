@@ -16,17 +16,22 @@ if (!UA_KEY) {
     throw 'Set your GA access key in ga-service/server.js';
 }
 
-var connector = new MbedConnectorApi({ accessKey: MBED_ACCESS_KEY });
+let connector = new MbedConnectorApi({ accessKey: MBED_ACCESS_KEY });
+let serialNumbers = {};
 
 async function subscribeToGesture(endpoint) {
     await connector.putResourceSubscription(endpoint, '/gesture/0/value');
     console.log(endpoint, 'Subscribed to gesture');
+
+    let serialNumber = await connector.getResourceValue(endpoint, '/deviceinfo/0/serial-number');
+    serialNumbers[endpoint] = serialNumber;
 }
 
 (async function() {
 
     try {
         await connector.startLongPolling();
+
         let endpoints = await connector.getEndpoints({ parameters: { type: 'gesture-detector' } });
 
         console.log(`Connected... Got ${endpoints.length} endpoints`, endpoints);
@@ -38,7 +43,13 @@ async function subscribeToGesture(endpoint) {
             return curr;
         }, {});
 
+        console.log('Serial numbers', serialNumbers);
+
         console.log('Initialized GA');
+
+        connector.on('registration', n => {
+            subscribeToGesture(n.ep);
+        });
 
         connector.on('notification', n => {
             let value;
@@ -60,8 +71,11 @@ async function subscribeToGesture(endpoint) {
 
             if (!value) return;
 
+            // add the serial number of the device
+            value += '-' + serialNumbers[n.ep];
+
             // create a Google Analytics event
-            visitors[n.ep].event("Gesture", value, function(err) {
+            visitors[n.ep].event('Gesture', value, function(err) {
                 if (err) return console.error('Sending event to GA failed', err, n.ep, value);
 
                 console.log('Sent event to GA', n.ep, value);
